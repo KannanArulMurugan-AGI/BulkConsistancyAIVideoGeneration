@@ -101,3 +101,40 @@ The `sync_gdrive.py` script provides a simple way to perform one-way and two-way
     ```bash
     python3 sync_gdrive.py two-way /path/to/local/folder 'remote/folder'
     ```
+
+### Colab TPU Setup for Video Generation
+
+For a more accessible, browser-based approach that leverages powerful TPUs, Google Colab is an excellent alternative to a dedicated VM. This section outlines how to set up a Colab environment for AI video generation.
+
+#### 1. Setting Up Google Colab with TPU
+
+1.  **Open a New Colab Notebook**: Go to [Google Colab](https://colab.research.google.com/) and create a new notebook.
+2.  **Enable TPU**:
+    *   Go to **Runtime** -> **Change runtime type**.
+    *   From the **Hardware accelerator** dropdown, select **TPU**.
+    *   Click **Save**.
+
+#### 2. Installing Necessary Libraries
+
+In a Colab cell, you'll need to install the required libraries. For PyTorch with TPU support, you'll need `torch_xla`.
+
+```python
+!pip install torch_xla
+```
+
+For TensorFlow, the TPU support is generally pre-configured in Colab's TPU runtime.
+
+#### 3. Accessing Data from Google Drive
+
+Instead of using `rclone` as you would with a local VM, Colab provides a simpler way to access your Google Drive files.
+
+1.  **Mount Google Drive**: Run the following code in a cell to mount your Google Drive.
+    ```python
+    from google.colab import drive
+    drive.mount('/content/drive')
+    ```
+2.  **Access Your Files**: Your Google Drive files will now be accessible under the `/content/drive/My Drive/` directory. You can use this path to load input data (like images or prompts) and save your generated videos.
+
+#### 4. Running Video Generation on TPU
+
+When running your video generation script, you need to ensure your model and data are moved to the TPU device.
