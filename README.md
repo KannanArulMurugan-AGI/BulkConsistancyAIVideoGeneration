@@ -70,3 +70,34 @@ For a truly automated workflow, you need a way to trigger the script without man
 This automated pipeline would enable you to generate high-quality, long-form videos with character and style consistency, all handled by a powerful cloud VM and stored conveniently in your Google Drive.
 
 This approach ensures seamless transitions and a professional, high-quality output, opening up new possibilities for AI-powered storytelling and content creation.
+
+### File Synchronization with Google Drive
+
+To facilitate the transfer of files between your local VM and Google Drive, this repository includes a Python script, `sync_gdrive.py`, which uses the powerful `rclone` command-line tool.
+
+#### 1. Install and Configure `rclone`
+
+Before using the script, you need to install and configure `rclone`.
+
+*   **Installation**: Follow the official `rclone` installation instructions for your operating system. For most Linux distributions, you can run:
+    ```bash
+    sudo -v ; curl https://rclone.org/install.sh | sudo bash
+    ```
+*   **Configuration**: Once installed, you need to configure `rclone` to connect to your Google Drive. The `sync_gdrive.py` script will guide you through this process if it detects that `rclone` is not configured. To manually configure it, run:
+    ```bash
+    rclone config
+    ```
+    Follow the interactive prompts to set up a new remote for Google Drive. It is recommended to name the remote `gdrive`.
+
+#### 2. Using the `sync_gdrive.py` Script
+
+The `sync_gdrive.py` script provides a simple way to perform one-way and two-way synchronization.
+
+*   **One-Way Sync (Local to Google Drive)**: This command syncs the contents of a local directory to a Google Drive folder. It will make the remote directory match the local one.
+    ```bash
+    python3 sync_gdrive.py one-way /path/to/local/folder 'remote/folder'
+    ```
+*   **Two-Way Sync (Bidirectional)**: This command syncs files in both directions, ensuring that both the local and remote directories are up to date.
+    ```bash
+    python3 sync_gdrive.py two-way /path/to/local/folder 'remote/folder'
+    ```
