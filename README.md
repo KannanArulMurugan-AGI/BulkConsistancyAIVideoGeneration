@@ -138,3 +138,6 @@ Instead of using `rclone` as you would with a local VM, Colab provides a simpler
 #### 4. Running Video Generation on TPU
 
 When running your video generation script, you need to ensure your model and data are moved to the TPU device.
+
+For a conceptual example of how this workflow would look in a Python script, see [`colab_tpu_video_generation.py`](colab_tpu_video_generation.py). This script outlines the key steps, from initializing the TPU to saving the final output, in a commented format.
+
