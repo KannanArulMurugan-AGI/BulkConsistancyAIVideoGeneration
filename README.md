@@ -93,13 +93,13 @@ Before using the script, you need to install and configure `rclone`.
 
 The `sync_gdrive.py` script provides a simple way to perform one-way and two-way synchronization.
 
-*   **One-Way Sync (Local to Google Drive)**: This command syncs the contents of a local directory to a Google Drive folder. It will make the remote directory match the local one.
+*   **One-Way Sync (Local to Google Drive)**: This command syncs the contents of a local directory to a Google Drive folder. It will make the remote directory match the local one. The remote path is relative to your Google Drive root.
     ```bash
-    python3 sync_gdrive.py one-way /path/to/local/folder 'remote/folder'
+    python3 sync_gdrive.py one-way /path/to/local/folder 'MyProject/RemoteFolder'
     ```
-*   **Two-Way Sync (Bidirectional)**: This command syncs files in both directions, ensuring that both the local and remote directories are up to date.
+*   **Two-Way Sync (Bidirectional)**: This command syncs files in both directions. It uses the `rclone bisync` command, which requires a modern version of `rclone`.
     ```bash
-    python3 sync_gdrive.py two-way /path/to/local/folder 'remote/folder'
+    python3 sync_gdrive.py two-way /path/to/local/folder 'MyProject/RemoteFolder'
     ```
 
 ### Colab TPU Setup for Video Generation
@@ -114,10 +114,14 @@ For a more accessible, browser-based approach that leverages powerful TPUs, Goog
     *   From the **Hardware accelerator** dropdown, select **TPU**.
     *   Click **Save**.
 3.  **Install Dependencies**:
-    *   Upload the `requirements.txt` file to your Colab environment.
+    *   Upload the `requirements.txt` file from this repository to your Colab environment.
     *   Run the following command in a cell to install the necessary libraries:
         ```bash
         !pip install -r requirements.txt
+        ```
+    *   Alternatively, you can install the packages directly:
+        ```bash
+        !pip install torch torch-xla diffusers transformers accelerate moviepy
         ```
 
 #### 2. Data and Storage Setup
@@ -140,20 +144,21 @@ The [`colab_tpu_video_generation.py`](colab_tpu_video_generation.py) script prov
 from google.colab import drive
 drive.mount('/content/drive')
 
-# 2. Install necessary libraries (if not using requirements.txt)
-# !pip install torch torch_xla transformers diffusers accelerate
+# 2. If you haven't used requirements.txt, install the libraries
+# !pip install torch torch-xla diffusers transformers accelerate moviepy
 
 # 3. Import the functions from the script (assuming it's uploaded to Colab)
 from colab_tpu_video_generation import initialize_tpu, load_video_generation_model, get_input_prompt, generate_video, save_video_to_gdrive
 
 # 4. Run the video generation pipeline
-print("Starting video generation workflow...")
+print("Starting conceptual video generation workflow...")
 device = initialize_tpu()
 video_pipe = load_video_generation_model(device)
 prompt = get_input_prompt()
 video_frames = generate_video(video_pipe, prompt, device)
 save_video_to_gdrive(video_frames, "my_first_ai_video.mp4")
 print("Workflow finished. Check your Google Drive for the output video.")
+print("NOTE: This was a simulation. No actual video file was created.")
 ```
 
 

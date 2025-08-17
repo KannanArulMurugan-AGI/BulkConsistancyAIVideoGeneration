@@ -1,1 +1,6 @@
-
+torch
+torch-xla
+diffusers
+transformers
+accelerate
+moviepy
