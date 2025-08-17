@@ -106,38 +106,54 @@ The `sync_gdrive.py` script provides a simple way to perform one-way and two-way
 
 For a more accessible, browser-based approach that leverages powerful TPUs, Google Colab is an excellent alternative to a dedicated VM. This section outlines how to set up a Colab environment for AI video generation.
 
-#### 1. Setting Up Google Colab with TPU
+#### 1. Environment Setup
 
 1.  **Open a New Colab Notebook**: Go to [Google Colab](https://colab.research.google.com/) and create a new notebook.
 2.  **Enable TPU**:
     *   Go to **Runtime** -> **Change runtime type**.
     *   From the **Hardware accelerator** dropdown, select **TPU**.
     *   Click **Save**.
+3.  **Install Dependencies**:
+    *   Upload the `requirements.txt` file to your Colab environment.
+    *   Run the following command in a cell to install the necessary libraries:
+        ```bash
+        !pip install -r requirements.txt
+        ```
 
-#### 2. Installing Necessary Libraries
+#### 2. Data and Storage Setup
 
-In a Colab cell, you'll need to install the required libraries. For PyTorch with TPU support, you'll need `torch_xla`.
-
-```python
-!pip install torch_xla
-```
-
-For TensorFlow, the TPU support is generally pre-configured in Colab's TPU runtime.
-
-#### 3. Accessing Data from Google Drive
-
-Instead of using `rclone` as you would with a local VM, Colab provides a simpler way to access your Google Drive files.
-
-1.  **Mount Google Drive**: Run the following code in a cell to mount your Google Drive.
+1.  **Mount Google Drive**: To save your generated videos and load any input data, mount your Google Drive:
     ```python
     from google.colab import drive
     drive.mount('/content/drive')
     ```
-2.  **Access Your Files**: Your Google Drive files will now be accessible under the `/content/drive/My Drive/` directory. You can use this path to load input data (like images or prompts) and save your generated videos.
+2.  **Create Directories**: It's good practice to create specific folders in your Google Drive for inputs and outputs, for example:
+    *   `My Drive/AI_Video_Generation/input_data`
+    *   `My Drive/AI_Video_Generation/output_videos`
 
-#### 4. Running Video Generation on TPU
+#### 3. End-to-End Workflow Example
 
-When running your video generation script, you need to ensure your model and data are moved to the TPU device.
+The [`colab_tpu_video_generation.py`](colab_tpu_video_generation.py) script provides a conceptual template for a text-to-video pipeline. Below is a complete workflow that you can run in a Colab notebook.
 
-For a conceptual example of how this workflow would look in a Python script, see [`colab_tpu_video_generation.py`](colab_tpu_video_generation.py). This script outlines the key steps, from initializing the TPU to saving the final output, in a commented format.
+```python
+# 1. Mount Google Drive
+from google.colab import drive
+drive.mount('/content/drive')
+
+# 2. Install necessary libraries (if not using requirements.txt)
+# !pip install torch torch_xla transformers diffusers accelerate
+
+# 3. Import the functions from the script (assuming it's uploaded to Colab)
+from colab_tpu_video_generation import initialize_tpu, load_video_generation_model, get_input_prompt, generate_video, save_video_to_gdrive
+
+# 4. Run the video generation pipeline
+print("Starting video generation workflow...")
+device = initialize_tpu()
+video_pipe = load_video_generation_model(device)
+prompt = get_input_prompt()
+video_frames = generate_video(video_pipe, prompt, device)
+save_video_to_gdrive(video_frames, "my_first_ai_video.mp4")
+print("Workflow finished. Check your Google Drive for the output video.")
+```
+
 
