@@ -34,11 +34,29 @@ def sync_one_way(local_path, remote_path):
     except FileNotFoundError:
         print("rclone command not found. Please install rclone.", file=sys.stderr)
 
-def sync_two_way(local_path, remote_path):
-    """Synchronizes files between local and remote."""
-    print(f"Starting two-way sync between '{local_path}' and 'gdrive:{remote_path}'...")
+def check_bisync_support():
+    """Check if the installed rclone version supports the 'bisync' command."""
     try:
-        subprocess.run(['rclone', 'bisync', local_path, f'gdrive:{remote_path}', '--progress'], check=True)
+        # Running with --version is a safe way to check without initiating a sync
+        result = subprocess.run(['rclone', 'bisync', '--version'], capture_output=True, text=True)
+        return result.returncode == 0 and "bisync" in result.stdout
+    except FileNotFoundError:
+        return False
+
+def sync_two_way(local_path, remote_path):
+    """
+    Performs a bidirectional sync between a local path and a remote path.
+    Uses the 'rclone bisync' command, which is designed for this purpose.
+    Note: 'bisync' may require an initial run to establish a baseline.
+    """
+    print(f"Starting two-way sync between '{local_path}' and 'gdrive:{remote_path}'...")
+    if not check_bisync_support():
+        print("Error: The installed version of rclone does not support the 'bisync' command.", file=sys.stderr)
+        print("Please upgrade to a newer version of rclone to use two-way sync.", file=sys.stderr)
+        sys.exit(1)
+
+    try:
+        subprocess.run(['rclone', 'bisync', local_path, f'gdrive:{remote_path}', '--progress', '--resync'], check=True)
         print("Two-way sync completed successfully.")
     except subprocess.CalledProcessError as e:
         print(f"Error during two-way sync: {e}", file=sys.stderr)
@@ -47,10 +65,17 @@ def sync_two_way(local_path, remote_path):
 
 def main():
     """Main function to handle command-line arguments."""
-    parser = argparse.ArgumentParser(description="Synchronize files between a local directory and Google Drive using rclone.")
+    parser = argparse.ArgumentParser(
+        description="Synchronize files between a local directory and Google Drive using rclone.",
+        formatter_class=argparse.RawTextHelpFormatter
+    )
     parser.add_argument('sync_type', choices=['one-way', 'two-way'], help="The type of synchronization.")
-    parser.add_argument('local_path', help="The local directory path.")
-    parser.add_argument('remote_path', help="The remote Google Drive path (e.g., 'backup/folder').")
+    parser.add_argument('local_path', help="The path to the local directory.")
+    parser.add_argument(
+        'remote_path',
+        help="The path on the remote Google Drive (e.g., 'MyProject/FolderName').\n"
+             "This path is relative to the root of your Google Drive."
+    )
 
     args = parser.parse_args()
 
